@@ -30,6 +30,7 @@ public class UserService : IUserService
         byte[] pepper = Encoding.UTF8.GetBytes(_config["Jwt:Pepper"]!);
 
         bool isCorrectPass = PasswordUtils.VarifyPassword(userSign.Password, user.Password, pepper);
+
         if (!isCorrectPass) return null;
 
         var claims = new[]
@@ -105,5 +106,18 @@ public class UserService : IUserService
             return userupdat;
         }
         return null;
+
+
+    }
+
+    public bool DeleteOneByEmail(string userEmail)
+    {
+        var result = _userRepository.DeleteOneByEmail(userEmail);
+
+        if (result)
+        {
+            return true;
+        }
+        return false;
     }
 }

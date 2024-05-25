@@ -39,6 +39,9 @@ public class Mapper : Profile
         CreateMap<ProductDTO, ProductReadDTO>();
         CreateMap<Product, ProductDTO>();
         CreateMap<ProductDTO, Product>();
+        CreateMap<ProductUpdateDTO, Product>()
+             .ForAllMembers(opts => opts.Condition((src, dest, srcProperty) => srcProperty != null));
+
 
         CreateMap<User, UserReadDto>();
         CreateMap<UserReadDto, User>();

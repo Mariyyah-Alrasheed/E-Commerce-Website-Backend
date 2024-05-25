@@ -15,9 +15,7 @@ public class OrderCreateDTO
 }
 public class CheckoutDto
 {
-    public Guid ProductId { get; set; }
-    public string Color { get; set; }
-    public char Size { get; set; }
+    public Guid StockId { get; set; }
     public int Quantity { get; set; }
 }
 public class OrderReadDto

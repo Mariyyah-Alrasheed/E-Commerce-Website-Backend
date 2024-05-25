@@ -32,4 +32,21 @@ public class UserRepository : IUserRepository
     {
         return updateUser;
     }
+
+
+    public bool DeleteOneByEmail(string email)
+    {
+        User? user = FindOneByEmail(email);
+        if (user is null)
+        {
+            return false;
+        }
+        else
+        {
+            _users.Remove(user);
+            _databaseContext.SaveChanges();
+            return true;
+        }
+    }
+
 }

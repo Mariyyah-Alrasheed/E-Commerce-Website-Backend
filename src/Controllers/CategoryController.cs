@@ -21,7 +21,7 @@ public class CategoryController : BaseController
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
 
     public CategoryReadDto CreateOne([FromBody] CategoryCreateDto category)
     {

@@ -44,6 +44,10 @@ public class UserController : BaseController
         if (user is not null)
         {
             var createdUser = _userService.SignUp(user);
+            if (createdUser is null)
+            {
+                return BadRequest();
+            }
             return CreatedAtAction(nameof(SignUp), createdUser);
         }
         return BadRequest();
@@ -65,4 +69,22 @@ public class UserController : BaseController
         }
         return BadRequest();
     }
+
+    [HttpDelete("{email}")]
+    // [Authorize(Roles = "Admin")]
+
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult DeleteOneByEmail(string email)
+    {
+        var result = _userService.DeleteOneByEmail(email);
+        if (result)
+        {
+            return NoContent();
+        }
+        return NotFound();
+
+    }
+
+
 }

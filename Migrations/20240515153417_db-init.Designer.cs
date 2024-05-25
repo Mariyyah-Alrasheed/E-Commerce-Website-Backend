@@ -13,7 +13,7 @@ using sda_onsite_2_csharp_backend_teamwork.src.Enums;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240508120539_db-init")]
+    [Migration("20240515153417_db-init")]
     partial class dbinit
     {
         /// <inheritdoc />
@@ -71,45 +71,6 @@ namespace Backend.Migrations
                     b.ToTable("address", (string)null);
                 });
 
-            modelBuilder.Entity("Hanan_csharp_backend_teamwork.src.Entities.Payment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("integer")
-                        .HasColumnName("amount");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("payment_date");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("payment_method");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<string>("TransactionId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("transaction_id");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_payments");
-
-                    b.ToTable("payments", (string)null);
-                });
-
             modelBuilder.Entity("sda_onsite_2_csharp_backend_teamwork.src.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -142,10 +103,6 @@ namespace Backend.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("order_date");
-
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("payment_id");
 
                     b.Property<Status>("Status")
                         .HasColumnType("status")
@@ -305,6 +262,11 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<string>("image")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image");
 
                     b.HasKey("Id")
                         .HasName("pk_product");
