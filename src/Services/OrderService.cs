@@ -35,6 +35,14 @@ public class OrderService : IOrderService
 
     public void Checkout(List<CheckoutDto> checkedoutItems, string userId)
     {
+        if (!Guid.TryParse(userId, out Guid userGuid))
+        {
+            Console.WriteLine("Invalid user ID format.");
+            return;
+        }
+
+
+
         var haveAddress = _addressService.FindOne(new Guid(userId));
         if (haveAddress is null)
         {
@@ -46,16 +54,14 @@ public class OrderService : IOrderService
             {
                 AddressId = haveAddress.Id,
                 OrderDate = DateTime.Now,
-                UserId = new Guid(userId),
-                // PaymentId = Guid.NewGuid(),
+                UserId = userGuid,
                 Status = Enums.Status.InProgress,
             };
             _orderRepository.CreateOne(order);
             foreach (var item in checkedoutItems)
             {
-                IEnumerable<Stock>? stocks = _stockService.FindByProductId(item.ProductId);
+                Stock? stock = _stockService.FindById(item.StockId);
 
-                Stock? stock = stocks.FirstOrDefault(stock => stock.Color == item.Color && stock.Size == item.Size);
                 if (stock is null) { continue; }
                 if (item.Quantity > stock.StockQuantity)
                 {
