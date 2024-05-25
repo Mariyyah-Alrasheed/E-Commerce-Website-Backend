@@ -8,4 +8,6 @@ public interface IUserService
     public string SignIn(UserSignIn user);
     public UserReadDto? FindOneByEmail(string email);
     public UserReadDto UpdateOne(string email, UserUpdateDto newValue);
+    public bool DeleteOneByEmail(string userEmail);
+
 }

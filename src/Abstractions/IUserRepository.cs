@@ -7,5 +7,6 @@ public interface IUserRepository
     public User CreateOne(User user);
     public User? FindOneByEmail(string email);
     public User UpdateOne(User updateUser);
+    public bool DeleteOneByEmail(string email);
 
 }

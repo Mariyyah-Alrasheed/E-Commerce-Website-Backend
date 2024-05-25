@@ -29,23 +29,6 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "payments",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    amount = table.Column<int>(type: "integer", nullable: false),
-                    payment_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    status = table.Column<int>(type: "integer", nullable: false),
-                    payment_method = table.Column<string>(type: "text", nullable: false),
-                    transaction_id = table.Column<string>(type: "text", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_payments", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "user",
                 columns: table => new
                 {
@@ -68,6 +51,7 @@ namespace Backend.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     category_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    image = table.Column<string>(type: "text", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false)
                 },
@@ -136,8 +120,7 @@ namespace Backend.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     order_date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     total_amount = table.Column<int>(type: "integer", nullable: false),
-                    status = table.Column<Status>(type: "status", nullable: false),
-                    payment_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    status = table.Column<Status>(type: "status", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -229,9 +212,6 @@ namespace Backend.Migrations
         {
             migrationBuilder.DropTable(
                 name: "order_item");
-
-            migrationBuilder.DropTable(
-                name: "payments");
 
             migrationBuilder.DropTable(
                 name: "order");
