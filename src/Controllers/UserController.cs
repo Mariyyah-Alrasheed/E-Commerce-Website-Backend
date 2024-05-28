@@ -21,7 +21,7 @@ public class UserController : BaseController
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     public List<UserReadDto> FindAll()
     {
         return _userService.FindAll();

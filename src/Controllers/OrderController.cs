@@ -16,7 +16,7 @@ public class OrderController : BaseController
     }
 
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
 
     public IEnumerable<OrderCreateDTO> FindAll()
     {

@@ -35,13 +35,6 @@ public class OrderService : IOrderService
 
     public void Checkout(List<CheckoutDto> checkedoutItems, string userId)
     {
-        if (!Guid.TryParse(userId, out Guid userGuid))
-        {
-            Console.WriteLine("Invalid user ID format.");
-            return;
-        }
-
-
 
         var haveAddress = _addressService.FindOne(new Guid(userId));
         if (haveAddress is null)
@@ -54,7 +47,7 @@ public class OrderService : IOrderService
             {
                 AddressId = haveAddress.Id,
                 OrderDate = DateTime.Now,
-                UserId = userGuid,
+                UserId = new Guid(userId),
                 Status = Enums.Status.InProgress,
             };
             _orderRepository.CreateOne(order);
@@ -62,24 +55,31 @@ public class OrderService : IOrderService
             {
                 Stock? stock = _stockService.FindById(item.StockId);
 
-                if (stock is null) { continue; }
+                if (stock is null) { return; }
                 if (item.Quantity > stock.StockQuantity)
                 {
                     Console.WriteLine($"Sold out {stock.Id}");
-                    continue;
+                    return;
                 }
-                order.TotalAmount += stock.Price;
-                OrderItem OrderItem = _mapper.Map<OrderItem>(item);
-                OrderItem.Id = Guid.NewGuid();
-                OrderItem.OrderId = order.Id;
-                OrderItem.StockId = stock.Id;
-                OrderItem.Quantity = item.Quantity;
-                _orderItemService.CreateOne(OrderItem);
+                Console.WriteLine($"stock.id ", stock.Id);
+                Console.WriteLine($"stock.Price ", stock.Price);
+                Console.WriteLine($"item.Quantity ", item.Quantity);
+
+                order.TotalAmount += stock.Price * item.Quantity;
+                OrderItem orderItem = new();
+                //     OrderItem OrderItem = _mapper.Map<OrderItem>(item);
+                // OrderItem.Id = Guid.NewGuid();
+                orderItem.OrderId = order.Id;
+                orderItem.StockId = stock.Id;
+                orderItem.Quantity = item.Quantity;
+                _orderItemService.CreateOne(orderItem);
                 stock.StockQuantity -= item.Quantity;
                 _stockService.UpdateOne(stock);
                 Console.WriteLine($" The stock {stock.StockQuantity}");
 
             }
+            _orderRepository.UpdateOne(order);
+
             Console.WriteLine($"Total amount = {order.TotalAmount}");
         }
     }

@@ -14,6 +14,9 @@ public class Mapper : Profile
 
         CreateMap<Address, AddressDTO>();
         CreateMap<AddressDTO, Address>();
+        CreateMap<AddressCreateDTO, Address>();
+        CreateMap<Address, AddressCreateDTO>();
+
 
 
 

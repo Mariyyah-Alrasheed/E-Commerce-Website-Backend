@@ -41,4 +41,10 @@ public class OrderRepository : IOrderRepository
         var itemsToRemove = _order.Where(item => item.UserId == userId);
         _order.RemoveRange(itemsToRemove);
     }
+
+    public void UpdateOne(Order updateOrder)
+    {
+        _order.Update(updateOrder);
+        _databaseContext.SaveChanges(); ;
+    }
 }
