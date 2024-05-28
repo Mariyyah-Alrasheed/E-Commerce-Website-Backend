@@ -13,9 +13,11 @@ public class AddressService : IAddressService
         _mapper = mapper;
     }
 
-    public AddressDTO CreateOne(AddressCreateDTO newUserAddress)
+    public AddressDTO CreateOne(AddressCreateDTO newUserAddress, string userId)
     {
         var userAddress = _mapper.Map<Address>(newUserAddress);
+        userAddress.UserId = new Guid(userId);
+
         var createdAdress = _addressRepoistory.CreateOne(userAddress);
 
         return _mapper.Map<AddressDTO>(createdAdress);

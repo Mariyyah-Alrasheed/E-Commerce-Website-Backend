@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sda_onsite_2_csharp_backend_teamwork.src.Controllers;
 namespace Hanan_csharp_backend_teamwork.src.Controllers;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 public class AddressController : BaseController
 {
@@ -18,13 +21,15 @@ public class AddressController : BaseController
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-    public ActionResult<AddressDTO> CreateOne(AddressCreateDTO userAddress)
+    public ActionResult<AddressDTO> CreateOne([FromBody] AddressCreateDTO userAddress)
     {
-        if (userAddress is null)
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userAddress is null || userId is null)
         {
             return BadRequest();
         }
-        _addressService.CreateOne(userAddress);
+        _addressService.CreateOne(userAddress, userId!);
         return CreatedAtAction(nameof(CreateOne), userAddress);
     }
 

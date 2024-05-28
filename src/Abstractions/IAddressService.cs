@@ -6,5 +6,5 @@ public interface IAddressService
     public IEnumerable<AddressDTO> FindAll();
     public AddressDTO? FindOne(Guid id);
     public bool DeleteById(Guid id);
-    public AddressDTO CreateOne(AddressCreateDTO userAddress);
+    public AddressDTO CreateOne(AddressCreateDTO newUserAddress, string userId);
 }
