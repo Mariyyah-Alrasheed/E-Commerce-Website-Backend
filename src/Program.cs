@@ -41,7 +41,10 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 
 var _config = builder.Configuration;
 
-var dataSourceBuilder = new NpgsqlDataSourceBuilder(@$"Host={_config["Db_Host"]};Username={_config["Db_Username"]};password={_config["Db_Password"]};Database={_config["Db_Database"]}");
+// var dataSourceBuilder = new NpgsqlDataSourceBuilder(@$"Host={_config["Db_Host"]};Username={_config["Db_Username"]};password={_config["Db_Password"]};Database={_config["Db_Database"]}");
+var connectionString = _config["DATABASE_URL"];
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+
 dataSourceBuilder.MapEnum<Role>();
 dataSourceBuilder.MapEnum<Status>();
 
