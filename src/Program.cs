@@ -124,11 +124,10 @@ app.MapControllers();
 
 
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 app.MapControllers();
@@ -139,5 +138,6 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapGet("/", () => "E-Commerce Backend is running 🚀");
 
 app.Run();
