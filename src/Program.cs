@@ -19,20 +19,18 @@ using Swashbuckle.AspNetCore.Filters;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(
-     options =>
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-        {
-            Description = "Bearer token authentication",
-            Name = "Authorization",
-            In = ParameterLocation.Header,
-            Scheme = "Bearer"
-        });
+        Description = "Bearer token authentication",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Scheme = "Bearer"
+    });
 
-        options.OperationFilter<SecurityRequirementsOperationFilter>();
-    }
-);
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -40,20 +38,29 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 
 var _config = builder.Configuration;
 
-var connectionString = _config["DATABASE_URL"];
+var databaseUrl = _config["DATABASE_URL"]!;
+var uri = new Uri(databaseUrl);
+var userInfo = uri.UserInfo.Split(':');
 
-// طباعة سلسلة الاتصال في اللوق لمساعدتك في تتبع القيمة عند التشغيل
-Console.WriteLine($"Using connection string: {connectionString}");
+var npgsqlConnectionStringBuilder = new NpgsqlConnectionStringBuilder
+{
+    Host = uri.Host,
+    Port = uri.Port,
+    Username = userInfo[0],
+    Password = userInfo[1],
+    Database = uri.AbsolutePath.Trim('/'),
+    SslMode = SslMode.Require,
+    TrustServerCertificate = true
+};
 
-// بناء DataSource باستخدام سلسلة الاتصال
-var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(npgsqlConnectionStringBuilder.ConnectionString);
 
 dataSourceBuilder.MapEnum<Role>();
 dataSourceBuilder.MapEnum<Status>();
 
 var dataSource = dataSourceBuilder.Build();
 
-builder.Services.AddDbContext<DatabaseContext>((options) =>
+builder.Services.AddDbContext<DatabaseContext>(options =>
 {
     options.UseNpgsql(dataSource).UseSnakeCaseNamingConvention();
 });
@@ -92,30 +99,31 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins(builder.Configuration["Cors_Origin"]!)
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .SetIsOriginAllowed((host) => true)
-                          .AllowCredentials();
-                      });
+        policy =>
+        {
+            policy.WithOrigins(builder.Configuration["Cors_Origin"]!)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed((host) => true)
+                .AllowCredentials();
+        });
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt_Issuer"],
-        ValidAudience = builder.Configuration["Jwt_Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt_SigningKey"]!))
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt_Issuer"],
+            ValidAudience = builder.Configuration["Jwt_Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt_SigningKey"]!))
+        };
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
