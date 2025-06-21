@@ -28,8 +28,7 @@ builder.Services.AddSwaggerGen(
             Name = "Authorization",
             In = ParameterLocation.Header,
             Scheme = "Bearer"
-        }
-        );
+        });
 
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     }
@@ -41,22 +40,13 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 
 var _config = builder.Configuration;
 
-// var dataSourceBuilder = new NpgsqlDataSourceBuilder(@$"Host={_config["Db_Host"]};Username={_config["Db_Username"]};password={_config["Db_Password"]};Database={_config["Db_Database"]}");
-var uri = new Uri(_config["DATABASE_URL"]!);
-var userInfo = uri.UserInfo.Split(':');
+var connectionString = _config["DATABASE_URL"];
 
-var npgsqlConnectionStringBuilder  = new NpgsqlConnectionStringBuilder
-{
-    Host = uri.Host,
-    Port = uri.Port,
-    Username = userInfo[0],
-    Password = userInfo[1],
-    Database = uri.AbsolutePath.Trim('/'),
-    SslMode = SslMode.Require,
-    TrustServerCertificate = true
-};
+// طباعة سلسلة الاتصال في اللوق لمساعدتك في تتبع القيمة عند التشغيل
+Console.WriteLine($"Using connection string: {connectionString}");
 
-var dataSourceBuilder = new NpgsqlDataSourceBuilder(npgsqlConnectionStringBuilder.ConnectionString);
+// بناء DataSource باستخدام سلسلة الاتصال
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 
 dataSourceBuilder.MapEnum<Role>();
 dataSourceBuilder.MapEnum<Status>();
@@ -68,12 +58,7 @@ builder.Services.AddDbContext<DatabaseContext>((options) =>
     options.UseNpgsql(dataSource).UseSnakeCaseNamingConvention();
 });
 
-
-
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-
-
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -111,9 +96,9 @@ builder.Services.AddCors(options =>
                       {
                           policy.WithOrigins(builder.Configuration["Cors_Origin"]!)
                           .AllowAnyHeader()
-                            .AllowAnyMethod()
-                            .SetIsOriginAllowed((host) => true)
-                            .AllowCredentials();
+                          .AllowAnyMethod()
+                          .SetIsOriginAllowed((host) => true)
+                          .AllowCredentials();
                       });
 });
 
@@ -128,8 +113,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt_Issuer"],
         ValidAudience = builder.Configuration["Jwt_Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt_SigningKey"]
-        !))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt_SigningKey"]!))
     };
 });
 
@@ -137,20 +121,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
 app.MapControllers();
-
-
-
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
 app.UseHttpsRedirection();
-app.MapControllers();
 
 app.UseCors(MyAllowSpecificOrigins);
-
 
 app.UseAuthentication();
 app.UseAuthorization();
