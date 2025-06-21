@@ -42,8 +42,21 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 var _config = builder.Configuration;
 
 // var dataSourceBuilder = new NpgsqlDataSourceBuilder(@$"Host={_config["Db_Host"]};Username={_config["Db_Username"]};password={_config["Db_Password"]};Database={_config["Db_Database"]}");
-var connectionString = _config["DATABASE_URL"];
-var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+var uri = new Uri(_config["DATABASE_URL"]!);
+var userInfo = uri.UserInfo.Split(':');
+
+var npgsqlConnectionStringBuilder  = new NpgsqlConnectionStringBuilder
+{
+    Host = uri.Host,
+    Port = uri.Port,
+    Username = userInfo[0],
+    Password = userInfo[1],
+    Database = uri.AbsolutePath.Trim('/'),
+    SslMode = SslMode.Require,
+    TrustServerCertificate = true
+};
+
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(npgsqlConnectionStringBuilder.ConnectionString);
 
 dataSourceBuilder.MapEnum<Role>();
 dataSourceBuilder.MapEnum<Status>();
@@ -54,6 +67,7 @@ builder.Services.AddDbContext<DatabaseContext>((options) =>
 {
     options.UseNpgsql(dataSource).UseSnakeCaseNamingConvention();
 });
+
 
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
